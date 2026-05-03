@@ -1,0 +1,733 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Scenario B: Updated Stock Picks — April 25, 2026</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<style>
+:root{
+  --bg:#070809;--bg2:#0c0e12;--surface:#111418;--surface2:#171b24;
+  --border:rgba(255,255,255,0.055);--border2:rgba(255,255,255,0.10);
+  --text:#dde1eb;--muted:#596070;--dim:#282d3a;
+  --gold:#d4a843;--gold-l:#f0c866;--gold-d:rgba(212,168,67,0.10);
+  --green:#3dd68c;--green-d:rgba(61,214,140,0.10);
+  --red:#f04040;--red-d:rgba(240,64,64,0.08);
+  --blue:#4b9fff;--blue-d:rgba(75,159,255,0.10);
+  --teal:#1ecebe;--teal-d:rgba(30,206,190,0.10);
+  --purple:#9b6dff;--purple-d:rgba(155,109,255,0.10);
+  --orange:#f07030;--amber:#ffb340;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;font-size:14px;line-height:1.5;}
+body::before{content:'';position:fixed;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--red) 0%,var(--gold) 35%,var(--teal) 70%,var(--purple) 100%);z-index:10;}
+
+.page{max-width:1160px;margin:0 auto;padding:38px 22px 80px;position:relative;}
+
+/* ── HEADER ── */
+.header{display:grid;grid-template-columns:1fr auto;gap:20px;align-items:end;padding-bottom:28px;margin-bottom:36px;border-bottom:1px solid var(--border2);}
+.eyebrow{font-family:'Space Mono',monospace;font-size:10px;letter-spacing:.22em;text-transform:uppercase;color:var(--red);margin-bottom:10px;}
+.big-title{font-family:'Syne',sans-serif;font-size:clamp(30px,5vw,54px);font-weight:800;line-height:.95;letter-spacing:-.02em;color:#fff;}
+.big-title em{font-style:normal;color:var(--gold-l);}
+.subtitle{margin-top:10px;font-size:12.5px;color:var(--muted);max-width:520px;line-height:1.65;}
+.pill{display:inline-flex;align-items:center;gap:7px;background:linear-gradient(135deg,rgba(240,64,64,.14),rgba(212,168,67,.10));border:1px solid rgba(240,64,64,.3);border-radius:6px;padding:8px 14px;font-family:'Space Mono',monospace;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--red);margin-bottom:8px;}
+.pill-dot{width:7px;height:7px;border-radius:50%;background:var(--red);animation:blink 1.4s ease-in-out infinite;}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.25}}
+.hdr-stats{font-family:'Space Mono',monospace;font-size:10px;color:var(--muted);line-height:1.85;text-align:right;}
+.hdr-stats span{color:var(--amber);}
+
+/* ── BREAKING BANNER ── */
+.breaking{background:linear-gradient(90deg,rgba(240,64,64,.08),rgba(240,112,48,.05));border:1px solid rgba(240,64,64,.25);border-radius:8px;padding:14px 20px;margin-bottom:28px;display:flex;gap:14px;align-items:flex-start;}
+.brk-tag{font-family:'Space Mono',monospace;font-size:9px;letter-spacing:.18em;text-transform:uppercase;background:var(--red);color:#fff;border-radius:3px;padding:3px 8px;flex-shrink:0;margin-top:2px;}
+.brk-text{font-size:12.5px;color:var(--text);line-height:1.6;}
+.brk-text strong{color:#fff;}
+
+/* ── MARKET STRIP ── */
+.market-strip{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:8px;margin-bottom:32px;}
+.mkt-card{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:12px 14px;position:relative;overflow:hidden;}
+.mkt-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;}
+.mkt-card.pos::before{background:var(--green);}
+.mkt-card.neg::before{background:var(--red);}
+.mkt-card.neu::before{background:var(--gold);}
+.mkt-label{font-family:'Space Mono',monospace;font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:4px;}
+.mkt-val{font-family:'Syne',sans-serif;font-size:20px;font-weight:700;line-height:1;}
+.mkt-val.pos{color:var(--green);}
+.mkt-val.neg{color:var(--red);}
+.mkt-val.neu{color:var(--gold);}
+.mkt-sub{font-size:10px;color:var(--muted);margin-top:3px;}
+
+/* ── SECTION HEAD ── */
+.sh{display:flex;align-items:center;gap:10px;margin-bottom:18px;}
+.sh-num{font-family:'Space Mono',monospace;font-size:10px;color:var(--dim);letter-spacing:.15em;}
+.sh-title{font-family:'Syne',sans-serif;font-size:17px;font-weight:700;color:#fff;}
+.tag{font-family:'Space Mono',monospace;font-size:9px;letter-spacing:.12em;text-transform:uppercase;padding:3px 9px;border-radius:20px;margin-left:auto;}
+.t-oil{background:var(--gold-d);color:var(--gold);border:1px solid rgba(212,168,67,.22);}
+.t-lng{background:var(--teal-d);color:var(--teal);border:1px solid rgba(30,206,190,.22);}
+.t-alt{background:var(--purple-d);color:var(--purple);border:1px solid rgba(155,109,255,.22);}
+.t-def{background:var(--red-d);color:var(--red);border:1px solid rgba(240,64,64,.18);}
+.t-new{background:rgba(255,179,64,.10);color:var(--amber);border:1px solid rgba(255,179,64,.25);}
+
+/* ── STOCK GRID ── */
+.sg{display:grid;grid-template-columns:repeat(auto-fill,minmax(255px,1fr));gap:11px;margin-bottom:36px;}
+.sc{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:16px 17px 15px;position:relative;overflow:hidden;transition:border-color .2s,transform .15s;}
+.sc:hover{border-color:var(--border2);transform:translateY(-1px);}
+.sc::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;}
+.c-g::before{background:linear-gradient(90deg,var(--gold),var(--orange));}
+.c-t::before{background:linear-gradient(90deg,var(--teal),#0ea5e9);}
+.c-p::before{background:linear-gradient(90deg,var(--purple),#d946ef);}
+.c-r::before{background:linear-gradient(90deg,var(--red),var(--orange));}
+.c-gr::before{background:linear-gradient(90deg,var(--green),var(--teal));}
+.c-a::before{background:linear-gradient(90deg,var(--amber),var(--gold));}
+.sc-hdr{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:9px;}
+.tkr{font-family:'Space Mono',monospace;font-size:16px;font-weight:700;letter-spacing:.04em;line-height:1;}
+.tkr.g{color:var(--gold-l);}.tkr.t{color:var(--teal);}.tkr.p{color:var(--purple);}
+.tkr.r{color:var(--red);}.tkr.gr{color:var(--green);}.tkr.a{color:var(--amber);}
+.co{font-size:11px;color:var(--muted);margin-top:2px;}
+.cv{font-family:'Space Mono',monospace;font-size:9px;letter-spacing:.1em;text-transform:uppercase;padding:3px 7px;border-radius:3px;flex-shrink:0;}
+.cv-h{background:rgba(61,214,140,.11);color:var(--green);border:1px solid rgba(61,214,140,.22);}
+.cv-m{background:rgba(212,168,67,.11);color:var(--gold);border:1px solid rgba(212,168,67,.22);}
+.cv-w{background:rgba(255,179,64,.11);color:var(--amber);border:1px solid rgba(255,179,64,.22);}
+.div{height:1px;background:var(--border);margin:9px 0;}
+.wl{font-family:'Space Mono',monospace;font-size:9px;letter-spacing:.15em;text-transform:uppercase;color:var(--muted);margin-bottom:4px;}
+.wt{font-size:12px;color:var(--text);line-height:1.55;}
+.ss{display:grid;grid-template-columns:1fr 1fr;gap:5px;margin-top:11px;}
+.si{background:var(--bg2);border-radius:5px;padding:6px 8px;}
+.sl{font-size:9px;color:var(--muted);font-family:'Space Mono',monospace;letter-spacing:.08em;text-transform:uppercase;margin-bottom:2px;}
+.sv{font-size:13px;font-weight:500;}
+.sv.up{color:var(--green);}.sv.dn{color:var(--red);}.sv.w{color:var(--amber);}.sv.n{color:var(--text);}
+
+/* ── CALLOUT ── */
+.callout{border-radius:10px;padding:20px 24px;margin-bottom:32px;display:grid;grid-template-columns:auto 1fr;gap:18px;align-items:start;}
+.callout.warn{background:linear-gradient(135deg,var(--surface2),rgba(212,168,67,.04));border:1px solid rgba(212,168,67,.20);}
+.callout.info{background:linear-gradient(135deg,var(--surface2),rgba(30,206,190,.03));border:1px solid rgba(30,206,190,.18);}
+.callout.fire{background:linear-gradient(135deg,var(--surface2),rgba(240,64,64,.05));border:1px solid rgba(240,64,64,.22);}
+.callout.nuke{background:linear-gradient(135deg,var(--surface2),rgba(155,109,255,.04));border:1px solid rgba(155,109,255,.20);}
+.ci{font-family:'Syne',sans-serif;font-size:26px;font-weight:800;line-height:1;padding-top:2px;}
+.ci.g{color:var(--gold);}.ci.t{color:var(--teal);}.ci.r{color:var(--red);}.ci.p{color:var(--purple);}
+.ch{font-family:'Syne',sans-serif;font-size:14px;font-weight:700;color:#fff;margin-bottom:5px;}
+.cb{font-size:12px;color:var(--muted);line-height:1.72;}
+.cb strong{color:var(--text);font-weight:500;}
+
+/* ── ETF ROW ── */
+.etf-row{display:grid;grid-template-columns:repeat(auto-fill,minmax(195px,1fr));gap:8px;margin-bottom:36px;}
+.etf-c{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:13px 15px;display:flex;justify-content:space-between;align-items:center;gap:10px;}
+.etf-t{font-family:'Space Mono',monospace;font-size:14px;font-weight:700;color:var(--gold);letter-spacing:.05em;}
+.etf-n{font-size:10.5px;color:var(--muted);margin-top:1px;}
+.etf-r{text-align:right;flex-shrink:0;}
+.etf-f{font-size:11px;color:var(--text);}
+.etf-w{font-size:10px;color:var(--muted);margin-top:2px;}
+
+/* ── AVOID GRID ── */
+.avoid-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(195px,1fr));gap:7px;margin-bottom:36px;}
+.av{background:var(--surface);border:1px solid var(--border);border-left:3px solid var(--red);border-radius:6px;padding:11px 13px;}
+.av-n{font-family:'Space Mono',monospace;font-size:11px;color:var(--red);margin-bottom:3px;}
+.av-r{font-size:11px;color:var(--muted);line-height:1.4;}
+
+/* ── CHART ── */
+.chart-card{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:18px 18px 14px;margin-bottom:36px;}
+.ct{font-family:'Space Mono',monospace;font-size:9px;letter-spacing:.15em;text-transform:uppercase;color:var(--muted);margin-bottom:14px;}
+.cw{position:relative;height:210px;}
+
+/* ── NEW FLAG ── */
+.new-flag{display:inline-block;background:rgba(255,179,64,.15);border:1px solid rgba(255,179,64,.3);color:var(--amber);font-family:'Space Mono',monospace;font-size:8px;letter-spacing:.12em;text-transform:uppercase;padding:2px 6px;border-radius:3px;margin-left:6px;vertical-align:middle;}
+.update-flag{display:inline-block;background:rgba(30,206,190,.12);border:1px solid rgba(30,206,190,.25);color:var(--teal);font-family:'Space Mono',monospace;font-size:8px;letter-spacing:.12em;text-transform:uppercase;padding:2px 6px;border-radius:3px;margin-left:6px;vertical-align:middle;}
+
+/* ── MINE TIMELINE ── */
+.mine-tl{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:18px 20px;margin-bottom:36px;}
+.mtl-title{font-family:'Space Mono',monospace;font-size:9px;letter-spacing:.18em;text-transform:uppercase;color:var(--muted);margin-bottom:14px;}
+.mtl-items{display:flex;gap:0;position:relative;}
+.mtl-items::before{content:'';position:absolute;top:10px;left:0;right:0;height:1px;background:linear-gradient(90deg,var(--red),var(--amber),var(--gold));}
+.mtl-item{flex:1;padding:24px 8px 0;position:relative;text-align:center;}
+.mtl-dot{width:10px;height:10px;border-radius:50%;margin:0 auto 8px;position:relative;z-index:1;}
+.mtl-dot.done{background:var(--red);box-shadow:0 0 0 3px rgba(240,64,64,.2);}
+.mtl-dot.now{background:var(--amber);box-shadow:0 0 0 4px rgba(255,179,64,.25);animation:blink 1.4s infinite;}
+.mtl-dot.future{background:var(--dim);border:1px solid var(--border2);}
+.mtl-date{font-family:'Space Mono',monospace;font-size:9px;color:var(--muted);margin-bottom:3px;}
+.mtl-text{font-size:11px;color:var(--text);line-height:1.35;}
+
+/* ── FOOTER ── */
+.footer{margin-top:44px;padding-top:18px;border-top:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;}
+.fn{font-size:11px;color:var(--dim);max-width:620px;line-height:1.5;}
+.fs{font-family:'Space Mono',monospace;font-size:10px;color:var(--dim);letter-spacing:.1em;}
+
+@keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+.fu{animation:fadeUp .45s ease forwards;opacity:0;}
+.d1{animation-delay:.04s}.d2{animation-delay:.09s}.d3{animation-delay:.14s}
+.d4{animation-delay:.19s}.d5{animation-delay:.24s}.d6{animation-delay:.29s}
+</style>
+</head>
+<body>
+<div class="page">
+
+<!-- HEADER -->
+<div class="header fu d1">
+  <div>
+    <p class="eyebrow">Updated Intelligence Brief — Day 56 — April 25, 2026</p>
+    <h1 class="big-title">Scenario B:<br><em>Stalemate Deepens.</em></h1>
+    <p class="subtitle">Full refresh: Friday closing prices, mine-sweeping intel, Pentagon 6-month timeline, refinery fires across 5 countries, US drought conditions, X-Energy IPO, and updated conviction rankings.</p>
+  </div>
+  <div style="text-align:right;">
+    <div class="pill"><span class="pill-dot"></span> Day 56 — No Deal</div>
+    <div class="hdr-stats">
+      S&P 500 Fri close: <span>7,165.08 (+0.80%)</span><br>
+      Brent crude (Fri): <span>~$94.40 (-1.51%)</span><br>
+      WTI (Fri close): <span>$94.40</span><br>
+      Ceasefire: <span>Extended indefinitely</span><br>
+      Hormuz status: <span>CLOSED — mines in strait</span>
+    </div>
+  </div>
+</div>
+
+<!-- BREAKING NEWS BANNER -->
+<div class="breaking fu d1">
+  <span class="brk-tag">⚡ Breaking</span>
+  <p class="brk-text">
+    <strong>Trump orders Navy to "shoot and kill" boats laying Hormuz mines (Apr 23).</strong> Pentagon assessment: it could take <strong>up to 6 months to fully clear mines from the Strait</strong> even after a deal. Iran lost track of some mines it planted — cannot fully reopen the Strait even if it wanted to. Kushner & Witkoff dispatched to Islamabad for new talks. Iran dismisses ceasefire extension as "meaningless" while blockade remains. Brent climbed back above $105 Thursday before settling Friday at ~$94. <strong>US Navy seized at least 4 Iranian tankers this week.</strong> Dual blockades = prolonged stalemate thesis strengthens.
+  </p>
+</div>
+
+<!-- MARKET STRIP -->
+<div class="market-strip fu d2">
+  <div class="mkt-card pos">
+    <p class="mkt-label">S&P 500</p>
+    <p class="mkt-val pos">7,165</p>
+    <p class="mkt-sub">Fri +0.80% — near ATH</p>
+  </div>
+  <div class="mkt-card neu">
+    <p class="mkt-label">Brent Crude</p>
+    <p class="mkt-val neu">$94.40</p>
+    <p class="mkt-sub">Was $105 Thu — volatile</p>
+  </div>
+  <div class="mkt-card neu">
+    <p class="mkt-label">WTI</p>
+    <p class="mkt-val neu">$89.61</p>
+    <p class="mkt-sub">Mon close — +7% spike</p>
+  </div>
+  <div class="mkt-card pos">
+    <p class="mkt-label">XOM</p>
+    <p class="mkt-val pos">$148.85</p>
+    <p class="mkt-sub">Fri range $146.95–$150.48</p>
+  </div>
+  <div class="mkt-card pos">
+    <p class="mkt-label">CVX</p>
+    <p class="mkt-val pos">~$184</p>
+    <p class="mkt-sub">Target raised → $187 (Scotiabank)</p>
+  </div>
+  <div class="mkt-card pos">
+    <p class="mkt-label">Cheniere (LNG)</p>
+    <p class="mkt-val pos">~$275</p>
+    <p class="mkt-sub">+52% YTD — Citi target $330</p>
+  </div>
+  <div class="mkt-card neg">
+    <p class="mkt-label">CEG</p>
+    <p class="mkt-val neg">~$313</p>
+    <p class="mkt-sub">−25% from 52-wk high → BUY DIP</p>
+  </div>
+  <div class="mkt-card pos">
+    <p class="mkt-label">CCJ (Cameco)</p>
+    <p class="mkt-val pos">$123.85</p>
+    <p class="mkt-sub">+25% YTD, +181% 52-wk</p>
+  </div>
+  <div class="mkt-card pos">
+    <p class="mkt-label">Gold</p>
+    <p class="mkt-val pos">$4,740</p>
+    <p class="mkt-sub">+0.36% Fri — war hedge</p>
+  </div>
+</div>
+
+<!-- MINE TIMELINE -->
+<div class="mine-tl fu d2">
+  <p class="mtl-title">Hormuz Mine Clearance Timeline — The Biggest New Variable</p>
+  <div class="mtl-items">
+    <div class="mtl-item">
+      <div class="mtl-dot done"></div>
+      <p class="mtl-date">Feb 28</p>
+      <p class="mtl-text">War begins. Iran mines strait.</p>
+    </div>
+    <div class="mtl-item">
+      <div class="mtl-dot done"></div>
+      <p class="mtl-date">Apr 8</p>
+      <p class="mtl-text">Ceasefire. Iran lost track of own mines.</p>
+    </div>
+    <div class="mtl-item">
+      <div class="mtl-dot done"></div>
+      <p class="mtl-date">Apr 11</p>
+      <p class="mtl-text">US Navy enters strait for mine clearing ops.</p>
+    </div>
+    <div class="mtl-item">
+      <div class="mtl-dot done"></div>
+      <p class="mtl-date">Apr 23</p>
+      <p class="mtl-text">Trump orders Navy: shoot boats laying mines. Tripling minesweepers.</p>
+    </div>
+    <div class="mtl-item">
+      <div class="mtl-dot now"></div>
+      <p class="mtl-date">Apr 25 ← NOW</p>
+      <p class="mtl-text">Pentagon: 6 months to fully clear even after deal. Blockade "tightening by the hour."</p>
+    </div>
+    <div class="mtl-item">
+      <div class="mtl-dot future"></div>
+      <p class="mtl-date">~Jul–Oct</p>
+      <p class="mtl-text">Earliest realistic full reopening if deal signed today.</p>
+    </div>
+    <div class="mtl-item">
+      <div class="mtl-dot future"></div>
+      <p class="mtl-date">~2028–2031</p>
+      <p class="mtl-text">Qatar Ras Laffan LNG repairs complete (3–5yr).</p>
+    </div>
+  </div>
+</div>
+
+<!-- GLOBAL REFINERY FIRES CALLOUT -->
+<div class="callout fire fu d2">
+  <div class="ci r">🔥</div>
+  <div>
+    <p class="ch">New Catalyst: Global Refinery Fire Wave — Multiplier on Oil Supply Crunch</p>
+    <p class="cb">
+      <strong>This is now a second independent crisis stacking on top of Hormuz.</strong> In the past 3 weeks: (1) <strong>Valero Port Arthur, TX</strong> — explosion, prolonged flaring, cause under investigation. (2) <strong>Oil well fire near Etoile, TX</strong> — emergency response, precautionary evacuations. (3) <strong>Viva Energy Geelong Refinery, Australia</strong> (Apr 16) — shutdown of a key fuel supply facility. (4) <strong>Russia NORSI refinery (Nizhny Novgorod)</strong> — suspended operations after Ukrainian drone strike Apr 5. (5) <strong>Russia Tuapse refinery (Krasnodar)</strong> — hit twice in one week. (6) <strong>India HPCL Pachpadra</strong> — delayed opening of a refinery India urgently needed. (7) <strong>Romania CET Vest explosion</strong> — Bucharest grid resilience under review. IEA: global crude throughputs cut by ~6M bbl/day. <strong>Middle distillate crack spreads hit all-time highs.</strong> This makes VLO, downstream refiners, and emergency storage plays much more compelling.
+    </p>
+  </div>
+</div>
+
+<!-- US DROUGHT + HYDROPOWER CALLOUT -->
+<div class="callout warn fu d2">
+  <div class="ci g">☀</div>
+  <div>
+    <p class="ch">US Drought + Hydro Disruption — Third Compounding Pressure</p>
+    <p class="cb">
+      EIA April STEO: <strong>a warmer-than-normal winter led to snow drought across western states</strong> — the region most reliant on hydropower. Reservoir levels in the Northwest and California are near capacity heading into summer, providing some relief, but the National Interagency Fire Center projected <strong>above-normal wildfire risk for Texas, Florida, Georgia, and the Carolinas</strong> — precisely the states with major refineries and energy infrastructure. 69% of the US was under drought conditions in January 2026. The South was the hardest-hit. <strong>Drought + heat + wildfire risk = power grid stress = nuclear and gas power demand surge.</strong> Fire season threatens to reach grid infrastructure that is already stretched by Hormuz-driven energy costs. This directly benefits CEG, NEE, GEV, and natural gas infrastructure plays.
+    </p>
+  </div>
+</div>
+
+<!-- CAT 1: BIG OIL — UPDATED -->
+<div class="sh fu d3">
+  <span class="sh-num">01</span>
+  <h2 class="sh-title">Big Oil & Integrated Majors <span class="update-flag">Updated</span></h2>
+  <span class="tag t-oil">Crude producers</span>
+</div>
+
+<div class="sg fu d3">
+  <div class="sc c-g">
+    <div class="sc-hdr">
+      <div><p class="tkr g">XOM</p><p class="co">ExxonMobil</p></div>
+      <span class="cv cv-h">Highest</span>
+    </div>
+    <div class="div"></div>
+    <p class="wl">Updated conviction</p>
+    <p class="wt">Reports Q1 earnings <strong>May 1</strong> — massive catalyst. 52-wk range $101–$176; closed Fri at $148.85, room to run. 4.7M boe/day output, $20B buybacks. 247WallSt flags "long oil trade stalling" short-term — but Q1 earnings from $89–119 oil quarter will be monster. Hold through earnings. Italy Golden Pass LNG deal (XOM + QatarEnergy) now accelerated by crisis.</p>
+    <div class="ss">
+      <div class="si"><p class="sl">Fri close</p><p class="sv up">$148.85</p></div>
+      <div class="si"><p class="sl">52-wk high</p><p class="sv n">$176.41</p></div>
+      <div class="si"><p class="sl">Q1 earnings</p><p class="sv w">May 1 🔥</p></div>
+      <div class="si"><p class="sl">Analyst target</p><p class="sv up">$153.54</p></div>
+    </div>
+  </div>
+
+  <div class="sc c-g">
+    <div class="sc-hdr">
+      <div><p class="tkr g">CVX</p><p class="co">Chevron</p></div>
+      <span class="cv cv-h">High</span>
+    </div>
+    <div class="div"></div>
+    <p class="wl">Updated conviction</p>
+    <p class="wt">Scotiabank raised target to <strong>$187</strong> this week. Reports Q1 on <strong>May 1</strong>. Microsoft + Chevron + Engine No.1 signed exclusivity deal for power generation — Chevron now has an AI data center energy angle. 39th consecutive annual dividend increase. Q1 2026 EPS miss risk noted but cash generation story intact at $90+ oil.</p>
+    <div class="ss">
+      <div class="si"><p class="sl">Fri close</p><p class="sv up">~$184</p></div>
+      <div class="si"><p class="sl">New target</p><p class="sv up">$187</p></div>
+      <div class="si"><p class="sl">Dividend</p><p class="sv up">39 yrs ↑</p></div>
+      <div class="si"><p class="sl">Q1 earnings</p><p class="sv w">May 1 🔥</p></div>
+    </div>
+  </div>
+
+  <div class="sc c-g">
+    <div class="sc-hdr">
+      <div><p class="tkr g">OXY</p><p class="co">Occidental Petroleum</p></div>
+      <span class="cv cv-h">High</span>
+    </div>
+    <div class="div"></div>
+    <p class="wl">Pure domestic oil leverage</p>
+    <p class="wt">100% US production — zero Gulf exposure. Maximum leverage to oil prices. Buffett's Berkshire stake still large. With refinery fires reducing global refined product supply, upstream producers like OXY gain further pricing power. Watch for Q1 earnings announcement this week.</p>
+    <div class="ss">
+      <div class="si"><p class="sl">Geography</p><p class="sv up">100% USA</p></div>
+      <div class="si"><p class="sl">BRK stake</p><p class="sv up">Significant</p></div>
+      <div class="si"><p class="sl">Oil leverage</p><p class="sv w">Very high</p></div>
+      <div class="si"><p class="sl">Fire boost</p><p class="sv up">Yes</p></div>
+    </div>
+  </div>
+
+  <div class="sc c-g">
+    <div class="sc-hdr">
+      <div><p class="tkr g">VLO</p><p class="co">Valero Energy — UPGRADED</p></div>
+      <span class="cv cv-w">Upgraded ↑</span>
+    </div>
+    <div class="div"></div>
+    <p class="wl">⚠ Major upgrade due to refinery fires</p>
+    <p class="wt"><strong>Valero Port Arthur exploded in late March</strong> — but their OTHER refineries are running flat out as competitors are offline. Middle distillate crack spreads hit all-time highs per IEA. EIA forecasts diesel margins remain "well above 2025 levels" through 2026. Every refinery fire that hits a competitor is a Valero pricing power event. Upgraded from Medium to High.</p>
+    <div class="ss">
+      <div class="si"><p class="sl">Crack spreads</p><p class="sv up">All-time high</p></div>
+      <div class="si"><p class="sl">Diesel margins</p><p class="sv up">Far above 2025</p></div>
+      <div class="si"><p class="sl">Fire catalyst</p><p class="sv up">Yes — competitors</p></div>
+      <div class="si"><p class="sl">Conviction</p><p class="sv w">Upgraded ↑</p></div>
+    </div>
+  </div>
+
+  <div class="sc c-g">
+    <div class="sc-hdr">
+      <div><p class="tkr g">DVN</p><p class="co">Devon Energy</p></div>
+      <span class="cv cv-h">High</span>
+    </div>
+    <div class="div"></div>
+    <p class="wl">Oil + LNG double play</p>
+    <p class="wt">West Texas pipeline now connecting Devon's output to Gulf Coast LNG export terminals — timed perfectly as global LNG demand explodes. Low breakeven. Can hedge via futures at current prices. The oil-plus-gas dual thesis is intact and strengthened by mines extending the closure timeline.</p>
+    <div class="ss">
+      <div class="si"><p class="sl">Breakeven</p><p class="sv up">Very low</p></div>
+      <div class="si"><p class="sl">LNG access</p><p class="sv up">New pipeline</p></div>
+      <div class="si"><p class="sl">Dual thesis</p><p class="sv up">Oil + Gas</p></div>
+      <div class="si"><p class="sl">Hedged</p><p class="sv up">Yes</p></div>
+    </div>
+  </div>
+
+  <div class="sc c-g">
+    <div class="sc-hdr">
+      <div><p class="tkr g">MOS</p><p class="co">Mosaic Company</p></div>
+      <span class="cv cv-h">High</span>
+    </div>
+    <div class="div"></div>
+    <p class="wl">Fertilizer scarcity + drought — compounding</p>
+    <p class="wt">Gulf still producing 30–35% of global urea with no replacement. Now add <strong>drought across the US South</strong> (69% of US under drought conditions, hardest-hit = Texas, FL, Carolinas) — farmers need more fertilizer per acre when drought stresses crops. Tight supply + elevated demand = powerful pricing. Canada + Florida mines untouched by any crisis.</p>
+    <div class="ss">
+      <div class="si"><p class="sl">Fert. prices</p><p class="sv up">+15–20%</p></div>
+      <div class="si"><p class="sl">Drought boost</p><p class="sv up">Yes — South US</p></div>
+      <div class="si"><p class="sl">Gulf exposure</p><p class="sv up">Zero</p></div>
+      <div class="si"><p class="sl">Supply src</p><p class="sv n">Canada + FL</p></div>
+    </div>
+  </div>
+</div>
+
+<!-- CAT 2: LNG — UPDATED -->
+<div class="sh fu d3">
+  <span class="sh-num">02</span>
+  <h2 class="sh-title">US LNG Exporters — Still the #1 Structural Play</h2>
+  <span class="tag t-lng">6-month+ thesis</span>
+</div>
+
+<div class="callout info fu d3">
+  <div class="ci t">!</div>
+  <div>
+    <p class="ch">The Mine Revelation Changes Everything for LNG</p>
+    <p class="cb">Even if Iran signs a deal <em>today</em>, the Pentagon says <strong>6 months to clear mines</strong>. That means the earliest possible strait normalization is October 2026. Qatar's Ras Laffan has a <strong>3–5 year repair timeline</strong>. US LNG supply grows <strong>84% over 5 years</strong> (S&P Global). Iran has "weaponized the chokepoint" and CFR analysts say it will continue doing so as leverage. The structural supply gap is now locked in for years. Cheniere just filed for a <strong>Stage 4 Corpus Christi expansion</strong> (24M tonnes/yr additional capacity). This is a decade-long investment thesis, not a trade.
+    </p>
+  </div>
+</div>
+
+<div class="sg fu d4">
+  <div class="sc c-t">
+    <div class="sc-hdr">
+      <div><p class="tkr t">LNG</p><p class="co">Cheniere Energy</p></div>
+      <span class="cv cv-h">Highest</span>
+    </div>
+    <div class="div"></div>
+    <p class="wl">Updated — Stage 4 expansion filed</p>
+    <p class="wt">Filed regulatory docs for <strong>Stage 4 at Corpus Christi: 24M additional tonnes/yr</strong>. Taiwan CPC Corporation signed long-term deal through 2050. 95%+ contracted through 2030. Citi target $330. Italy deal (with XOM) accelerated. NPR confirmed Cheniere's Feygin calling Qatar supply gap a "guillotine issue" for global markets. Consumer sentiment hit record lows Friday — which paradoxically confirms the energy crisis is real and LNG replacements are urgent.</p>
+    <div class="ss">
+      <div class="si"><p class="sl">Current price</p><p class="sv up">~$275</p></div>
+      <div class="si"><p class="sl">Citi target</p><p class="sv up">$330</p></div>
+      <div class="si"><p class="sl">Stage 4 filed</p><p class="sv up">24M MT/yr ↑</p></div>
+      <div class="si"><p class="sl">Contracted</p><p class="sv up">95%+ → 2030</p></div>
+    </div>
+  </div>
+
+  <div class="sc c-t">
+    <div class="sc-hdr">
+      <div><p class="tkr t">VG</p><p class="co">Venture Global LNG</p></div>
+      <span class="cv cv-h">High</span>
+    </div>
+    <div class="div"></div>
+    <p class="wl">30% spot = maximum LNG price upside</p>
+    <p class="wt">Up ~50% since war began. Louisiana Phase 2 ($8B+) secured. Higher spot exposure than Cheniere means it captures the most when LNG prices are at +140% in Asia and +91% in Europe. Higher risk, higher reward. The structural demand gap from mines + Ras Laffan makes the 5-year growth curve steeper than any pre-war model assumed.</p>
+    <div class="ss">
+      <div class="si"><p class="sl">Since war</p><p class="sv up">+50%</p></div>
+      <div class="si"><p class="sl">Spot expo.</p><p class="sv up">~30%</p></div>
+      <div class="si"><p class="sl">Phase 2</p><p class="sv n">$8B secured</p></div>
+      <div class="si"><p class="sl">Risk</p><p class="sv w">Higher</p></div>
+    </div>
+  </div>
+
+  <div class="sc c-t">
+    <div class="sc-hdr">
+      <div><p class="tkr t">EQNR</p><p class="co">Equinor (Norway)</p></div>
+      <span class="cv cv-h">High</span>
+    </div>
+    <div class="div"></div>
+    <p class="wl">Europe's lifeline — second time in 4 years</p>
+    <p class="wt">Up ~70% YTD. Europe's storage levels 5-year lows, ~140 cargoes below normal. Equinor is the ONLY supplier who can pipe gas to Europe at under $2/MBtu. CFR analysis: NATO allies will continue to favor gas. Hegseth told Europe to "get in a boat" — meaning US won't maintain Hormuz security forever. That pushes Europe even harder to lock in Equinor long-term deals.</p>
+    <div class="ss">
+      <div class="si"><p class="sl">YTD gain</p><p class="sv up">+70%</p></div>
+      <div class="si"><p class="sl">EU storage</p><p class="sv dn">5-yr low</p></div>
+      <div class="si"><p class="sl">All-in cost</p><p class="sv up">&lt;$2/MBtu</p></div>
+      <div class="si"><p class="sl">NATO angle</p><p class="sv up">Strong</p></div>
+    </div>
+  </div>
+
+  <div class="sc c-t">
+    <div class="sc-hdr">
+      <div><p class="tkr t">WMB</p><p class="co">Williams Companies</p></div>
+      <span class="cv cv-h">High</span>
+    </div>
+    <div class="div"></div>
+    <p class="wl">Transco pipeline — fee-based backbone</p>
+    <p class="wt">Operates Transco, the largest US gas pipeline — every LNG cargo Cheniere exports flows through Williams infrastructure first. Fee-based revenue: doesn't depend on commodity prices, only volume. Volume is at record levels. With Stage 4 Corpus Christi filing, WMB wins regardless of oil price direction. Wildfire risk to pipelines is real — monitor southern exposure. Strong dividend.</p>
+    <div class="ss">
+      <div class="si"><p class="sl">Revenue</p><p class="sv up">Fee-based</p></div>
+      <div class="si"><p class="sl">Price risk</p><p class="sv up">None</p></div>
+      <div class="si"><p class="sl">Volume</p><p class="sv up">Record high</p></div>
+      <div class="si"><p class="sl">Risk flag</p><p class="sv w">Fire exposure</p></div>
+    </div>
+  </div>
+</div>
+
+<!-- CAT 3: ALT ENERGY — UPDATED WITH X-ENERGY -->
+<div class="sh fu d4">
+  <span class="sh-num">03</span>
+  <h2 class="sh-title">Alternative Energy & Gas Alternatives <span class="new-flag">X-Energy IPO Added</span></h2>
+  <span class="tag t-alt">Crisis accelerant</span>
+</div>
+
+<div class="callout nuke fu d4">
+  <div class="ci p">⚛</div>
+  <div>
+    <p class="ch">Nuclear Is Now the Energy Security Story of 2026</p>
+    <p class="cb">
+      X-Energy debuted Friday at <strong>$30.11 (priced $23, +32% first day)</strong> — the <strong>largest nuclear public offering on record</strong>, raising $1B+. Nvidia crossed $5 trillion market cap. DOE Energy Secretary Chris Wright confirmed the first <strong>5–10 US nuclear reactors are "almost certainly" receiving DOE loans</strong>. Cameco signed a <strong>$2.6B deal with India's Department of Atomic Energy</strong> — 22M pounds of uranium through 2035. CEG is down 25% from 52-wk high — Motley Fool and Barclays both calling it a <strong>buy-the-dip</strong>. The nuclear trade isn't slowing. The drought and wildfire risk hitting hydro and solar in the West make always-on nuclear more essential than ever.
+    </p>
+  </div>
+</div>
+
+<div class="sg fu d5">
+  <div class="sc c-p">
+    <div class="sc-hdr">
+      <div><p class="tkr p">CEG</p><p class="co">Constellation Energy</p></div>
+      <span class="cv cv-w">Buy the Dip</span>
+    </div>
+    <div class="div"></div>
+    <p class="wl">−25% from high = entry opportunity</p>
+    <p class="wt">America's #1 nuclear + clean energy operator. <strong>Down 25% from 52-week high</strong> due to sentiment rotation, NOT fundamentals. Barclays maintains Buy. Analyst 12-month target <strong>$382 (+21% from here)</strong>. Signed 380MW CyrusOne data center deal this week. 20% EPS CAGR through 2029. The crisis makes every nuclear kWh worth more. "The nuclear energy trade is back in focus" — CNBC, April 2026.</p>
+    <div class="ss">
+      <div class="si"><p class="sl">Current</p><p class="sv w">~$313</p></div>
+      <div class="si"><p class="sl">Target</p><p class="sv up">$382 (+21%)</p></div>
+      <div class="si"><p class="sl">Off high</p><p class="sv dn">−25%</p></div>
+      <div class="si"><p class="sl">Entry</p><p class="sv up">DIP BUY</p></div>
+    </div>
+  </div>
+
+  <div class="sc c-p">
+    <div class="sc-hdr">
+      <div><p class="tkr p">CCJ</p><p class="co">Cameco Corp</p></div>
+      <span class="cv cv-h">Highest</span>
+    </div>
+    <div class="div"></div>
+    <p class="wl">$2.6B India deal — structural demand locked</p>
+    <p class="wt"><strong>Signed $2.6B deal with India's Dept of Atomic Energy</strong> — 22M lbs uranium through 2035. Up 25% YTD, +181% past 52 weeks. Motley Fool: "Buy on every dip." Also holds stake in Westinghouse (reactor builder). Every new reactor = decades of Cameco uranium supply contracts. The mine-clearance 6-month delay strengthens the nuclear acceleration narrative globally.</p>
+    <div class="ss">
+      <div class="si"><p class="sl">Fri close</p><p class="sv up">$123.85</p></div>
+      <div class="si"><p class="sl">52-wk gain</p><p class="sv up">+181%</p></div>
+      <div class="si"><p class="sl">India deal</p><p class="sv up">$2.6B / 2035</p></div>
+      <div class="si"><p class="sl">Westinghouse</p><p class="sv up">Stake held</p></div>
+    </div>
+  </div>
+
+  <div class="sc c-a">
+    <div class="sc-hdr">
+      <div><p class="tkr a">XE <span class="new-flag">IPO</span></p><p class="co">X-Energy Inc.</p></div>
+      <span class="cv cv-w">High Risk / High Reward</span>
+    </div>
+    <div class="div"></div>
+    <p class="wl">⚡ Just IPO'd Friday — Largest nuclear IPO ever</p>
+    <p class="wt">Advanced nuclear reactor company. Priced at <strong>$23, opened at $30.11, +32% first day</strong>. Raised $1B+. "Largest nuclear public offering on record." Building small modular reactors (SMRs) designed for fast deployment. Energy crisis gives SMR developers massive tailwind — governments need always-on clean power fast. High risk, early stage, but the market is clearly pricing in nuclear acceleration.</p>
+    <div class="ss">
+      <div class="si"><p class="sl">IPO price</p><p class="sv n">$23</p></div>
+      <div class="si"><p class="sl">Open price</p><p class="sv up">$30.11</p></div>
+      <div class="si"><p class="sl">Day 1 gain</p><p class="sv up">+32%</p></div>
+      <div class="si"><p class="sl">Risk level</p><p class="sv w">Very high</p></div>
+    </div>
+  </div>
+
+  <div class="sc c-p">
+    <div class="sc-hdr">
+      <div><p class="tkr p">NEE</p><p class="co">NextEra Energy</p></div>
+      <span class="cv cv-h">High</span>
+    </div>
+    <div class="div"></div>
+    <p class="wl">Wind + solar + nuclear + gas trifecta</p>
+    <p class="wt">World's largest wind + solar operator. 4 nuclear plants + Iowa Duane Arnold restart deal with Google (2029). Drought + wildfire threat to western hydro and solar (ironically) benefits NextEra's more diversified, distributed grid assets. 31 consecutive years of dividend raises. P/E ~25.3 — in line with premium tech. Long-term PPA revenue locked regardless of oil prices.</p>
+    <div class="ss">
+      <div class="si"><p class="sl">Div raises</p><p class="sv up">31 yrs ↑</p></div>
+      <div class="si"><p class="sl">P/E</p><p class="sv n">~25.3</p></div>
+      <div class="si"><p class="sl">Nuclear</p><p class="sv n">4 reactors</p></div>
+      <div class="si"><p class="sl">Revenue</p><p class="sv up">PPA-locked</p></div>
+    </div>
+  </div>
+
+  <div class="sc c-p">
+    <div class="sc-hdr">
+      <div><p class="tkr p">GEV</p><p class="co">GE Vernova</p></div>
+      <span class="cv cv-h">High</span>
+    </div>
+    <div class="div"></div>
+    <p class="wl">Gas turbines + wind + nuclear reactors</p>
+    <p class="wt">GE's energy spinoff. Makes gas turbines (the bridge fuel the world is racing to deploy), 57K wind turbines globally, AND nuclear reactors (one of few companies with significant nuclear reactor market share). Motley Fool just added GEV as a nuclear-play pick alongside CCJ and CEG. Data center power demand + energy crisis = massive GEV backlogs. Triple exposure: fossil bridge + wind + nuclear.</p>
+    <div class="ss">
+      <div class="si"><p class="sl">Wind turbines</p><p class="sv n">57,000</p></div>
+      <div class="si"><p class="sl">Nuclear</p><p class="sv up">Reactor mfr</p></div>
+      <div class="si"><p class="sl">Gas turbines</p><p class="sv up">Bridge fuel</p></div>
+      <div class="si"><p class="sl">AI demand</p><p class="sv up">Data centers</p></div>
+    </div>
+  </div>
+
+  <div class="sc c-p">
+    <div class="sc-hdr">
+      <div><p class="tkr p">FSLR</p><p class="co">First Solar</p></div>
+      <span class="cv cv-m">Medium</span>
+    </div>
+    <div class="div"></div>
+    <p class="wl">US-made solar — energy independence angle</p>
+    <p class="wt">Only major US solar manufacturer (not China-dependent). SC facility ($300M) coming online H2 2026. Drought and fire risk hitting conventional power = more solar urgency. IRA tailwinds intact despite administration — energy security narrative overrides politics here. $1.7–2.3B net cash. <strong>Monitor: wildfire risk in Southeast is near their new SC plant.</strong></p>
+    <div class="ss">
+      <div class="si"><p class="sl">Made in</p><p class="sv up">USA only</p></div>
+      <div class="si"><p class="sl">SC plant</p><p class="sv n">H2 2026</p></div>
+      <div class="si"><p class="sl">Net cash</p><p class="sv up">$1.7–2.3B</p></div>
+      <div class="si"><p class="sl">Watch</p><p class="sv w">SE fire risk</p></div>
+    </div>
+  </div>
+
+  <div class="sc c-gr">
+    <div class="sc-hdr">
+      <div><p class="tkr gr">BEP</p><p class="co">Brookfield Renewable</p></div>
+      <span class="cv cv-m">Medium</span>
+    </div>
+    <div class="div"></div>
+    <p class="wl">Hydro + wind + nuclear services</p>
+    <p class="wt">Up 40%+ past 12 months. Largest hydro operator globally — but watch: <strong>drought conditions in western US and La Niña patterns reduce hydro output</strong>. The diversification into wind, solar, and nuclear services (Westinghouse) partially offsets this. Long-term fixed PPAs = stable cash. Strong dividend. Conviction slightly reduced vs last update due to drought hydro risk.</p>
+    <div class="ss">
+      <div class="si"><p class="sl">12mo gain</p><p class="sv up">+40%+</p></div>
+      <div class="si"><p class="sl">Dividend</p><p class="sv up">$1.57/sh</p></div>
+      <div class="si"><p class="sl">Drought risk</p><p class="sv w">Hydro↓</p></div>
+      <div class="si"><p class="sl">Nuke svc</p><p class="sv n">Westinghouse</p></div>
+    </div>
+  </div>
+</div>
+
+<!-- CAT 4: DEFENSE -->
+<div class="sh fu d5">
+  <span class="sh-num">04</span>
+  <h2 class="sh-title">Defense & Aerospace <span class="update-flag">Upgraded — Navy Shakeup</span></h2>
+  <span class="tag t-def">Escalation plays</span>
+</div>
+
+<div class="sg fu d5" style="grid-template-columns:repeat(auto-fill,minmax(220px,1fr))">
+  <div class="sc c-r">
+    <div class="sc-hdr">
+      <div><p class="tkr r">ITA</p><p class="co">iShares Aerospace & Defense ETF</p></div>
+      <span class="cv cv-h">High</span>
+    </div>
+    <div class="div"></div>
+    <p class="wt">+66% past 12 months. Navy Secretary Phelan ousted this week (30+ Pentagon officials fired since Hegseth). Instability = restructuring = new contracts. Senate rejected Iran war powers limit for the 5th time. The blockade is officially "tightening by the hour."</p>
+  </div>
+  <div class="sc c-r">
+    <div class="sc-hdr">
+      <div><p class="tkr r">RTX</p><p class="co">RTX / Raytheon</p></div>
+      <span class="cv cv-h">High</span>
+    </div>
+    <div class="div"></div>
+    <p class="wt">Makes the missiles/interceptors being consumed daily. US tripling minesweepers = procurement surge. Every day stalemate holds = longer RTX backlog. US seized 4+ Iranian tankers this week using Navy destroyers — RTX-equipped vessels.</p>
+  </div>
+  <div class="sc c-r">
+    <div class="sc-hdr">
+      <div><p class="tkr r">LMT</p><p class="co">Lockheed Martin</p></div>
+      <span class="cv cv-h">High</span>
+    </div>
+    <div class="div"></div>
+    <p class="wt">Fri close $555.43 (−2.89% — pullback = entry). THAAD, PAC-3, F-35. Hegseth told Europe to "get in a boat" — that's European defense procurement language. Watch Monday.</p>
+  </div>
+  <div class="sc c-r">
+    <div class="sc-hdr">
+      <div><p class="tkr r">PLTR</p><p class="co">Palantir</p></div>
+      <span class="cv cv-m">Medium</span>
+    </div>
+    <div class="div"></div>
+    <p class="wt">AI defense intelligence. Pentagon memos, tanker seizure ops, mine clearing coordination — all Palantir use cases expanding. Your existing position, Brad — the indefinitely extended conflict is a thesis extender.</p>
+  </div>
+</div>
+
+<!-- ETF SUMMARY -->
+<div class="sh fu d5">
+  <span class="sh-num">05</span>
+  <h2 class="sh-title">ETF Baskets</h2>
+  <span class="tag" style="background:var(--blue-d);color:var(--blue);border:1px solid rgba(75,159,255,.22);">Index plays</span>
+</div>
+<div class="etf-row fu d5">
+  <div class="etf-c"><div><p class="etf-t">XLE</p><p class="etf-n">Energy Select SPDR</p></div><div class="etf-r"><p class="etf-f">Broad oil/gas</p><p class="etf-w">52-wk high — Mon surge</p></div></div>
+  <div class="etf-c"><div><p class="etf-t">XOP</p><p class="etf-n">S&P O&G Exploration</p></div><div class="etf-r"><p class="etf-f">Upstream leverage</p><p class="etf-w">More oil-price beta vs XLE</p></div></div>
+  <div class="etf-c"><div><p class="etf-t">ITA</p><p class="etf-n">iShares Aerospace/Defense</p></div><div class="etf-r"><p class="etf-f">Defense basket</p><p class="etf-w">+66% past 12 months</p></div></div>
+  <div class="etf-c"><div><p class="etf-t">ICLN</p><p class="etf-n">iShares Global Clean Energy</p></div><div class="etf-r"><p class="etf-f">Alt energy</p><p class="etf-w">CEG, NEE, FSLR + more</p></div></div>
+  <div class="etf-c"><div><p class="etf-t">URA</p><p class="etf-n">Global X Uranium ETF</p></div><div class="etf-r"><p class="etf-f">Uranium/nuclear</p><p class="etf-w">CCJ + miners + services</p></div></div>
+</div>
+
+<!-- UPDATED SECTOR CHART -->
+<div class="chart-card fu d5">
+  <p class="ct">Updated Scenario B — projected sector performance (6-month) — April 25, 2026 basis</p>
+  <div class="cw">
+    <canvas id="sectorChart" role="img" aria-label="Updated bar chart of projected sector performance in Scenario B. US LNG leads at +50%, Refinery/Midstream now second at +40% due to fires, Oilfield Services +35%, Nuclear/SMR +30%, Big Oil +25%, Defense +22%, Fertilizer +20%, Renewables (excl hydro) +14%, Hydro (drought risk) +8%, Levered Tech -20%, Consumer Disc -28%, Airlines -35%."></canvas>
+  </div>
+</div>
+
+<!-- AVOID — UPDATED -->
+<div class="sh fu d6">
+  <span class="sh-num">06</span>
+  <h2 class="sh-title">Avoid / Short in Scenario B <span class="update-flag">Updated</span></h2>
+  <span class="tag t-def">Danger zone</span>
+</div>
+<div class="avoid-grid fu d6">
+  <div class="av"><p class="av-n">Airlines (DAL, UAL, AAL)</p><p class="av-r">AAL now guiding full-year loss. Jet fuel (heating oil) spiked 5% Monday alone. AAL down 8%+ since war began. Consumer sentiment at record lows.</p></div>
+  <div class="av"><p class="av-n">IBM / ServiceNow (NOW)</p><p class="av-r">NOW crashed 18% Thursday — subscription revenue "hindered by Middle East conflict." IBM slid 7.5%. Tech revenue exposed to Middle East clients is cracking.</p></div>
+  <div class="av"><p class="av-n">Apparel Retail (GAP, CRI)</p><p class="av-r">Asia manufacturing chains still disrupted. Supertanker rates up 90%. Carter's: closing 150 stores, cutting 15% of workforce. Oxford Industries: EPS hit $1.25–1.50/share.</p></div>
+  <div class="av"><p class="av-n">Honeywell (HON)</p><p class="av-r">Fell 5.6% Thursday on missed revenue + lackluster Q2 guidance ($2.35–2.45 vs $2.56 estimate). Industrial exposure to Middle East + energy cost headwinds.</p></div>
+  <div class="av"><p class="av-n">Consumer Discretionary broadly</p><p class="av-r">Consumer sentiment at record lows in April (49.8). Stagflation = discretionary spending collapses first. High oil = higher prices on everything.</p></div>
+  <div class="av"><p class="av-n">Hydro utilities (drought risk)</p><p class="av-r">Western snow drought + La Niña = lower reservoir inflows. Brookfield's hydro output may be impacted. Watch Pacific Northwest utilities specifically.</p></div>
+  <div class="av"><p class="av-n">High-leverage growth tech</p><p class="av-r">10-yr yield at 4.4%+, Fed paralyzed. Duration risk back. Semiconductor names ripping (Intel, NVDA, AMD) — but software and SaaS seeing Middle East revenue holes (NOW, IBM).</p></div>
+  <div class="av"><p class="av-n">China-exposed importers</p><p class="av-r">China gets ~33% of oil via Hormuz. US seized tanker bound for Zhoushan, China. Beijing squeezed on energy. US-China trade war on top of energy war = double hit.</p></div>
+</div>
+
+<!-- WHAT TO WATCH THIS WEEK -->
+<div class="callout warn fu d6">
+  <div class="ci g">📅</div>
+  <div>
+    <p class="ch">Upcoming Catalysts — Week of April 28, 2026</p>
+    <p class="cb">
+      <strong>Mon Apr 28:</strong> Kushner/Witkoff Pakistan talks begin — watch for any Iran response signal.<br>
+      <strong>Tue Apr 29:</strong> Fed meeting begins. Stagflation trap — any guidance will move energy stocks.<br>
+      <strong>Wed Apr 30:</strong> FOMC statement. Will not cut. Watch language on "inflation vs employment" balance.<br>
+      <strong>Thu May 1:</strong> <strong>XOM + CVX Q1 earnings</strong> — massive event. Q1 covered $81–119 oil — expect monster numbers. Also Mag-7 earnings (Meta, Microsoft, Amazon, Apple) — energy cost headwind disclosures.<br>
+      <strong>Ongoing:</strong> Hormuz mine clearance ops. Kushner-Iran back-channel. IRGC ship seizures. Wildfire season entering peak for Texas/Southeast. Monitor Valero Port Arthur investigation outcome.
+    </p>
+  </div>
+</div>
+
+<div class="footer fu d6">
+  <p class="fn">Not financial advice. Research compilation only. Sources: CNBC, NBC News, PBS, Al Jazeera, NPR, CFR, Wikipedia (2026 Iran war ceasefire), IEA Oil Market Report Apr 2026, EIA STEO Apr 2026, TRT World, Robinhood, Yahoo Finance, Motley Fool, 247WallSt, Barclays, Scotiabank, Citi, Goldman Sachs. Data as of April 25, 2026 market close. Consult a qualified financial advisor before investing.</p>
+  <p class="fs">AI UPSCALE LLC — BRIEF v2 — APR 25 2026</p>
+</div>
+
+</div><!-- /page -->
+
+<script>
+const ctx = document.getElementById('sectorChart').getContext('2d');
+const labels = ['US LNG','Refinery/Midstream','Oilfield Svc','Nuclear/SMR','Big Oil','Defense','Fertilizer','Renewables','Hydro (drought)','Levered Tech','Consumer Disc','Airlines'];
+const vals = [50,40,35,30,25,22,20,14,8,-20,-28,-35];
+const bg = vals.map(v=>v>0?(v>=40?'rgba(30,206,190,.18)':v>=25?'rgba(212,168,67,.18)':v>=14?'rgba(61,214,140,.15)':'rgba(255,179,64,.13)'):'rgba(240,64,64,.15)');
+const bc = vals.map(v=>v>0?(v>=40?'#1ecebe':v>=25?'#d4a843':v>=14?'#3dd68c':'#ffb340'):'#f04040');
+new Chart(ctx,{type:'bar',data:{labels,datasets:[{label:'%',data:vals,backgroundColor:bg,borderColor:bc,borderWidth:1.5,borderRadius:4}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{backgroundColor:'#111418',borderColor:'rgba(255,255,255,.07)',borderWidth:1,titleColor:'#596070',bodyColor:'#dde1eb',titleFont:{family:'Space Mono',size:10},bodyFont:{family:'DM Sans',size:13},callbacks:{label:c=>(c.raw>0?'+':'')+c.raw+'%'}}},scales:{x:{grid:{color:'rgba(255,255,255,.035)'},ticks:{color:'#596070',font:{family:'Space Mono',size:8.5},maxRotation:38,autoSkip:false},border:{display:false}},y:{grid:{color:'rgba(255,255,255,.05)'},ticks:{color:'#596070',font:{family:'Space Mono',size:9},callback:v=>(v>0?'+':'')+v+'%'},border:{display:false}}}}});
+</script>
+</body>
+</html>
